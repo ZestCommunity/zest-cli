@@ -85,3 +85,6 @@ result
 
 # Direnv output
 .direnv
+
+# VSCode
+.vscode/
