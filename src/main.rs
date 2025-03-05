@@ -2,23 +2,6 @@ use core::panic;
 use std::{env, num::NonZeroU32, path::PathBuf, time::Duration};
 
 use cargo_metadata::camino::Utf8PathBuf;
-#[cfg(feature = "field-control")]
-use cargo_v5::{commands::field_control::run_field_control_tui, errors::CliError};
-use cargo_v5::{
-    commands::{
-        build::{build, CargoOpts},
-        cat::cat,
-        devices::devices,
-        dir::dir,
-        log::log,
-        new::new,
-        rm::rm,
-        screenshot::screenshot,
-        terminal::terminal,
-        upload::{upload, AfterUpload, UploadOpts},
-    },
-    connection::{open_connection, switch_radio_channel},
-};
 use chrono::Utc;
 use clap::{Args, Parser, Subcommand};
 use flexi_logger::{AdaptiveFormat, FileSpec, LogfileSelector, LoggerHandle};
@@ -34,6 +17,23 @@ use vex_v5_serial::{
         radio::RadioChannel,
     },
     string::FixedString,
+};
+#[cfg(feature = "field-control")]
+use zest_cli::{commands::field_control::run_field_control_tui, errors::CliError};
+use zest_cli::{
+    commands::{
+        build::{build, CargoOpts},
+        cat::cat,
+        devices::devices,
+        dir::dir,
+        log::log,
+        new::new,
+        rm::rm,
+        screenshot::screenshot,
+        terminal::terminal,
+        upload::{upload, AfterUpload, UploadOpts},
+    },
+    connection::{open_connection, switch_radio_channel},
 };
 
 cargo_subcommand_metadata::description!("Manage vexide projects");

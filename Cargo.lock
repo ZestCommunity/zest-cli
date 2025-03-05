@@ -232,41 +232,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a33d3b80a8db16c4ad7676653766a8e59b5f95443c8823cb7cff587b90cb91ba"
 
 [[package]]
-name = "cargo-v5"
-version = "0.10.3"
-dependencies = [
- "bidiff",
- "cargo-subcommand-metadata",
- "cargo_metadata",
- "cfg-if",
- "chrono",
- "clap",
- "crossterm 0.28.1",
- "directories",
- "flate2",
- "flexi_logger",
- "fs-err",
- "humansize",
- "image",
- "indicatif",
- "inquire",
- "log",
- "miette",
- "object",
- "ratatui",
- "reqwest",
- "serde",
- "serde_ini",
- "serde_json",
- "tabwriter",
- "tar",
- "thiserror",
- "tokio",
- "tui-term",
- "vex-v5-serial",
-]
-
-[[package]]
 name = "cargo_metadata"
 version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2781,3 +2746,38 @@ name = "zeroize"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ced3678a2879b30306d323f4542626697a464a97c0a07c9aebf7ebca65cd4dde"
+
+[[package]]
+name = "zest-cli"
+version = "0.0.0"
+dependencies = [
+ "bidiff",
+ "cargo-subcommand-metadata",
+ "cargo_metadata",
+ "cfg-if",
+ "chrono",
+ "clap",
+ "crossterm 0.28.1",
+ "directories",
+ "flate2",
+ "flexi_logger",
+ "fs-err",
+ "humansize",
+ "image",
+ "indicatif",
+ "inquire",
+ "log",
+ "miette",
+ "object",
+ "ratatui",
+ "reqwest",
+ "serde",
+ "serde_ini",
+ "serde_json",
+ "tabwriter",
+ "tar",
+ "thiserror",
+ "tokio",
+ "tui-term",
+ "vex-v5-serial",
+]

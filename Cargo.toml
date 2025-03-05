@@ -1,16 +1,17 @@
 [package]
-name = "cargo-v5"
-version = "0.10.3"
+name = "zest-cli"
+version = "0.0.0"
 edition = "2021"
 authors = [
     "vexide",
     "Gavin Niederman <gavinniederman@gmail.com>",
     "doinkythederp <doinkythederp@icloud.com>",
     "Tropical",
+    "Liam Teale <liamteale6@gmail.com>",
 ]
 license = "MIT"
-description = "A cargo subcommand for managing V5 Brain Rust projects"
-repository = "https://github.com/vexide/cargo-pros"
+description = "CLI for working with ZestCode projects"
+repository = "https://github.com/ZestCommunity/zest-cli"
 
 [package.metadata.v5]
 icon = "robot"
@@ -67,5 +68,5 @@ fetch-template = ["dep:reqwest", "dep:directories"]
 full = ["field-control", "fetch-template"]
 
 [[bin]]
-name = "cargo-v5"
+name = "zest-cli"
 required-features = ["clap"]

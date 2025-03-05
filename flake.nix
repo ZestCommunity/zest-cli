@@ -37,20 +37,20 @@
             cargo = pkgs.rust-bin.stable.latest.default;
             rustc = pkgs.rust-bin.stable.latest.default;
           };
-          build-cargo-v5 = { features ? [ ], ... }:
-            pkgs.lib.checkListOfEnum "cargo-v5: features" [
+          build-zest-cli = { features ? [ ], ... }:
+            pkgs.lib.checkListOfEnum "zest-cli: features" [
               "full"
               "field-control"
               "fetch-template"
             ] features naersk'.buildPackage {
-              name = "cargo-v5";
-              pname = "cargo-v5";
+              name = "zest-cli";
+              pname = "zest-cli";
               version = (builtins.fromTOML (builtins.readFile ./Cargo.toml)).package.version;
 
               src = ./.;
 
               passthru = {
-                withFeatures = features: build-cargo-v5 { inherit features; };
+                withFeatures = features: build-zest-cli { inherit features; };
               };
 
               cargoBuildOptions = opts:
@@ -62,16 +62,16 @@
               nativeBuildInputs = with pkgs; [ pkg-config dbus udev ];
             };
         in rec {
-          cargo-v5 = build-cargo-v5 { };
-          cargo-v5-full = build-cargo-v5 { features = [ "full" ]; };
-          default = cargo-v5;
+          zest-cli = build-zest-cli { };
+          zest-cli-full = build-zest-cli { features = [ "full" ]; };
+          default = zest-cli;
         };
 
         apps = rec {
-          cargo-v5 = flake-utils.lib.mkApp { drv = packages.cargo-v5; };
-          cargo-v5-full =
-            flake-utils.lib.mkApp { drv = packages.cargo-v5-full; };
-          default = cargo-v5;
+          zest-cli = flake-utils.lib.mkApp { drv = packages.zest-cli; };
+          zest-cli-full =
+            flake-utils.lib.mkApp { drv = packages.zest-cli-full; };
+          default = zest-cli;
         };
       }));
 }
