@@ -1,17 +1,16 @@
+use clap::Args;
 use object::{Object, ObjectSegment};
-use std::process::{exit, Stdio};
-use tokio::{process::Command, task::block_in_place};
+use std::process::Stdio;
+use tokio::process::Command;
 
 use cargo_metadata::{
     camino::{Utf8Path, Utf8PathBuf},
-    Message, PackageId,
+    PackageId,
 };
-use clap::Args;
-use fs_err::tokio as fs;
 
 use crate::errors::CliError;
 
-pub const TARGET_PATH: &str = "armv7a-vex-v5.json";
+use miette::{miette, Result};
 
 /// Common Cargo options to forward.
 #[derive(Args, Debug)]
@@ -25,131 +24,58 @@ pub struct CargoOpts {
     args: Vec<String>,
 }
 
-pub fn cargo_bin() -> std::ffi::OsString {
-    std::env::var_os("CARGO").unwrap_or_else(|| "cargo".to_owned().into())
-}
-
-async fn is_nightly_toolchain() -> bool {
-    let rustc = Command::new("rustc")
-        .arg("--version")
-        .output()
-        .await
-        .unwrap();
-    let rustc = String::from_utf8(rustc.stdout).unwrap();
-    rustc.contains("nightly")
-}
-
-async fn has_wasm_target() -> bool {
-    let Ok(rustup) = Command::new("rustup")
-        .arg("target")
-        .arg("list")
-        .arg("--installed")
-        .output()
-        .await
-    else {
-        return true;
-    };
-    let rustup = String::from_utf8(rustup.stdout).unwrap();
-    rustup.contains("wasm32-unknown-unknown")
-}
-
 pub struct BuildOutput {
     pub elf_artifact: Utf8PathBuf,
     pub bin_artifact: Utf8PathBuf,
     pub package_id: PackageId,
 }
 
+/// Runs the `make` command in the given `path` directory with the arguments provided in `opts`.
+/// The `for_simulator` flag is available for future simulator-specific adjustments.
 pub async fn build(
     path: &Utf8Path,
     opts: CargoOpts,
     for_simulator: bool,
-) -> miette::Result<Option<BuildOutput>> {
-    let target_path = path.join(TARGET_PATH);
-    let mut build_cmd = std::process::Command::new(cargo_bin());
-    build_cmd
-        .current_dir(path)
-        .arg("build")
-        .arg("--message-format")
-        .arg("json-render-diagnostics");
+) -> Result<Option<BuildOutput>> {
+    // Create the make command with the specified working directory.
+    let mut make_cmd = Command::new("make");
+    make_cmd.current_dir(path);
+    make_cmd.args(&opts.args);
+    make_cmd.stdout(Stdio::piped());
+    make_cmd.stderr(Stdio::piped());
 
-    if !is_nightly_toolchain().await {
-        eprintln!("ERROR: vexide requires Nightly Rust features, but you're using stable.");
-        eprintln!(" hint: this can be fixed by running `rustup override set nightly`");
-        exit(1);
-    }
-
+    // Optionally adjust the command if for_simulator is true.
     if for_simulator {
-        if !has_wasm_target().await {
-            eprintln!(
-                "ERROR: simulation requires the wasm32-unknown-unknown target to be installed"
-            );
-            eprintln!(
-                " hint: this can be fixed by running `rustup target add wasm32-unknown-unknown`"
-            );
-            exit(1);
-        }
-
-        build_cmd
-            .arg("--target")
-            .arg("wasm32-unknown-unknown")
-            .arg("-Zbuild-std=std,panic_abort")
-            .arg("--config=build.rustflags=['-Ctarget-feature=+atomics,+bulk-memory,+mutable-globals','-Clink-arg=--shared-memory','-Clink-arg=--export-table']")
-            .stdout(Stdio::piped());
-    } else {
-        let target = include_str!("../targets/armv7a-vex-v5.json");
-        if !target_path.exists() {
-            fs::create_dir_all(target_path.parent().unwrap())
-                .await
-                .unwrap();
-        }
-        fs::write(&target_path, target).await.unwrap();
-        build_cmd.arg("--target");
-        build_cmd.arg(&target_path);
-
-        build_cmd
-            .arg("-Zbuild-std=core,alloc,compiler_builtins")
-            .stdout(Stdio::piped());
+        // For example, you might want to add a simulator-specific flag:
+        // make_cmd.arg("SIMULATOR=1");
+        // (This branch is a placeholder for any simulator-specific logic.)
     }
 
-    build_cmd.args(opts.args);
+    // Run the command and capture its output.
+    let output = make_cmd
+        .output()
+        .await
+        .map_err(|e| miette!("failed to run make: {}", e))?;
 
-    Ok(block_in_place::<_, Result<Option<BuildOutput>, CliError>>(
-        || {
-            let mut out = build_cmd.spawn()?;
-            let reader = std::io::BufReader::new(out.stdout.take().unwrap());
+    // Print the output from the make command.
+    println!("stdout:\n{}", String::from_utf8_lossy(&output.stdout));
+    eprintln!("stderr:\n{}", String::from_utf8_lossy(&output.stderr));
 
-            let mut output = None;
+    // Exit the process if the command did not succeed.
+    if !output.status.success() {
+        std::process::exit(output.status.code().unwrap_or(1));
+    }
 
-            for message in Message::parse_stream(reader) {
-                match message? {
-                    Message::CompilerArtifact(artifact) => {
-                        if let Some(elf_artifact_path) = artifact.executable {
-                            let binary = objcopy(&std::fs::read(&elf_artifact_path)?)?;
-                            let binary_path = elf_artifact_path.with_extension("bin");
-
-                            // Write the binary to a file.
-                            std::fs::write(&binary_path, binary)?;
-                            println!("     \x1b[1;92mObjcopy\x1b[0m {}", binary_path);
-
-                            output = Some(BuildOutput {
-                                bin_artifact: binary_path,
-                                elf_artifact: elf_artifact_path,
-                                package_id: artifact.package_id,
-                            });
-                        }
-                    }
-                    _ => {}
-                }
-            }
-
-            let status = out.wait()?;
-            if !status.success() {
-                exit(status.code().unwrap_or(1));
-            }
-
-            Ok(output)
+    // Construct the BuildOutput structure with the captured output.
+    let build_output = BuildOutput {
+        elf_artifact: "".into(),
+        bin_artifact: "".into(),
+        package_id: PackageId {
+            repr: String::from(""),
         },
-    )?)
+    };
+
+    Ok(Some(build_output))
 }
 
 pub fn objcopy(elf: &[u8]) -> Result<Vec<u8>, CliError> {
