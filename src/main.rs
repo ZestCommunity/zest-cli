@@ -36,13 +36,13 @@ use zest_cli::{
     connection::{open_connection, switch_radio_channel},
 };
 
-cargo_subcommand_metadata::description!("Manage vexide projects");
+cargo_subcommand_metadata::description!("Manage ZestCode projects");
 
 /// Cargo's CLI arguments
 #[derive(Parser, Debug)]
 #[clap(name = "cargo", bin_name = "cargo")]
 enum Cargo {
-    /// Manage vexide projects.
+    /// Manage ZestCode projects.
     #[clap(version)]
     V5 {
         #[command(subcommand)]
@@ -53,7 +53,7 @@ enum Cargo {
     },
 }
 
-/// A possible `cargo v5` subcommand.
+/// A possible `zest` subcommand.
 #[derive(Subcommand, Debug)]
 enum Command {
     /// Build a project for the V5 brain.
@@ -82,7 +82,7 @@ enum Command {
     /// Build, upload, and run a program on the V5 brain, showing its output in the terminal.
     #[clap(visible_alias = "r")]
     Run(UploadOpts),
-    /// Create a new vexide project with a given name.
+    /// Create a new ZestCode project with a given name.
     #[clap(visible_alias = "n")]
     New {
         /// The name of the project.
@@ -91,7 +91,7 @@ enum Command {
         #[clap(flatten)]
         download_opts: DownloadOpts,
     },
-    /// Creates a new vexide project in the current directory
+    /// Creates a new ZestCode project in the current directory
     Init {
         #[clap(flatten)]
         download_opts: DownloadOpts,

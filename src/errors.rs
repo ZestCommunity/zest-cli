@@ -61,14 +61,14 @@ pub enum CliError {
     #[error("{0} is not a valid icon.")]
     #[diagnostic(
         code(zest_cli::invalid_icon),
-        help("See `cargo v5 upload --help` for a list of valid icon identifiers.")
+        help("See `zest upload --help` for a list of valid icon identifiers.")
     )]
     InvalidIcon(String),
 
     #[error("{0} is not a valid upload strategy.")]
     #[diagnostic(
         code(zest_cli::invalid_upload_strategy),
-        help("See `cargo v5 upload --help` for a list of valid upload strategies.")
+        help("See `zest upload --help` for a list of valid upload strategies.")
     )]
     InvalidUploadStrategy(String),
 
@@ -82,7 +82,7 @@ pub enum CliError {
     #[error("ELF build artifact not found. Is this a binary crate?")]
     #[diagnostic(
         code(zest_cli::no_artifact),
-        help("`cargo v5 build` should generate an ELF file in your project's `target` folder unless this is a library crate. You can explicitly supply a file to upload with the `--file` (`-f`) argument.")
+        help("`zest build` should generate an ELF file in your project's `target` folder unless this is a library crate. You can explicitly supply a file to upload with the `--file` (`-f`) argument.")
     )]
     NoArtifact,
 
@@ -100,14 +100,14 @@ pub enum CliError {
     #[error("Controller never switched radio channels.")]
     #[diagnostic(
         code(zest_cli::radio_channel_disconnect_timeout),
-        help("Try running `cargo v5 upload` again. If the problem persists, power cycle your controller and Brain.")
+        help("Try running `zest upload` again. If the problem persists, power cycle your controller and Brain.")
     )]
     RadioChannelDisconnectTimeout,
 
     #[error("Controller never reconnected after switching radio channels.")]
     #[diagnostic(
         code(zest_cli::radio_channel_reconnect_timeout),
-        help("Try running `cargo v5 upload` again. If the problem persists, power cycle your controller and Brain.")
+        help("Try running `zest upload` again. If the problem persists, power cycle your controller and Brain.")
     )]
     RadioChannelReconnectTimeout,
 
@@ -115,7 +115,7 @@ pub enum CliError {
     #[error("No V5 controllers found.")]
     #[diagnostic(
         code(zest_cli::no_controller),
-        help("`cargo v5 fc` can only be ran over a controller connection. Make sure you have a controller plugged into USB, then try again.")
+        help("`zest fc` can only be ran over a controller connection. Make sure you have a controller plugged into USB, then try again.")
     )]
     NoController,
 
