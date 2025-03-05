@@ -19,8 +19,8 @@ use vex_v5_serial::{
     string::FixedString,
 };
 #[cfg(feature = "field-control")]
-use zest_cli::{commands::field_control::run_field_control_tui, errors::CliError};
-use zest_cli::{
+use zest::{commands::field_control::run_field_control_tui, errors::CliError};
+use zest::{
     commands::{
         build::{build, CargoOpts},
         cat::cat,

@@ -1,5 +1,5 @@
 [package]
-name = "zest-cli"
+name = "zest"
 version = "0.0.0"
 edition = "2021"
 authors = [
@@ -68,5 +68,5 @@ fetch-template = ["dep:reqwest", "dep:directories"]
 full = ["field-control", "fetch-template"]
 
 [[bin]]
-name = "zest-cli"
+name = "zest"
 required-features = ["clap"]
