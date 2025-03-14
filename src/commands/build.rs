@@ -44,13 +44,6 @@ pub async fn build(
     make_cmd.stdout(Stdio::piped());
     make_cmd.stderr(Stdio::piped());
 
-    // Optionally adjust the command if for_simulator is true.
-    if for_simulator {
-        // For example, you might want to add a simulator-specific flag:
-        // make_cmd.arg("SIMULATOR=1");
-        // (This branch is a placeholder for any simulator-specific logic.)
-    }
-
     // Run the command and capture its output.
     let output = make_cmd
         .output()
